@@ -1,0 +1,151 @@
+
+@font-face {
+  font-family: 'OurNaming';
+  src: url('American Typewriter Regular.ttf')  format('truetype'); /* Safari, Android, iOS */
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #222222;
+    color: #fff;
+}
+
+#michal {
+  border: 3px solid red;
+  padding: 10px;
+  background: yellow;
+}
+
+#demo {
+    height: 400px;
+}
+
+button {
+    background-color: white;
+    border: none;
+    color: #222222;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+	border-radius: 4px;
+}
+
+button#go_top:hover {
+  background-color: #555;
+  color: white;
+}
+
+
+.attribute_num {
+    font-size: 20px;
+    color: #00FFFF;   
+}
+.container {
+    width: 1000px;
+    min-height: 1000px;
+    margin: 0 auto;
+    /* top and bottom, right and left */
+    text-align: left;
+    /* top, right, bottom, left */
+    padding-top: 0em;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-bottom: 1em;
+}
+
+h3 {
+    font-size: 30px;
+}
+
+h4 {
+    font-size: 25px;
+	font-style: italic
+}
+
+video {
+   height: 256px;
+}
+
+video.pairs {
+	height: 360px;
+}
+
+h3.sub {
+	font-style: italic;
+}
+
+.bottom {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  margin: 50px;
+  /*background: #ccc;*/
+  /*color: #fff*/
+}
+
+table.inter {
+    /*border: 1px solid white;*/
+    text-align: center;
+    width: 80%;
+}
+
+ul {
+    padding-left: 20px;
+}
+
+tr.buff {
+    height: 10px;
+}
+
+.our_naming {
+	font-family: 'OurNaming', Fallback, sans-serif;
+}
+
+th.user {
+    width: 20%;
+}
+
+th.inter {
+    width: 20%;
+    border: 1px solid white;
+}
+
+td.space {
+    border-top: 1px solid gray;
+    height: 10px;
+}
+
+td.buff {
+    /*border-left: 1px solid gray;	*/
+}
+
+th.buff {
+    /*border-left: 1px solid gray;*/
+    color: gray;
+}
+
+a:link {
+    color: #4488ff;
+    text-decoration: underline;
+}
+
+a:active {
+    color: #4488ff;
+    text-decoration: underline;
+}
+
+a:visited {
+    color: #4488ff;
+    text-decoration: underline;
+}
+
+a:hover {
+    color: #ff0000;
+    text-decoration: none;
+}
+
+.reference {
+    font-size: 80%;
+}

@@ -1,0 +1,1439 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Paper 289: Self-Distilled StyleGAN: Towards Generation from Interenet Photos</title>
+    <link href="css/style.css" rel="stylesheet" type="text/css" />
+    <script>
+        function play_vid(tag) {
+        vid = document.getElementById(tag)
+        if (vid.paused) 
+          vid.play();
+        else 
+          vid.pause(); 
+      }
+      function play_all() {
+        vids = document.getElementsByTagName('video')
+        play = vids[0].paused
+        for (i = 0; i < vids.length; i++) {
+          if (play) {
+            vids[i].play(); 
+          }
+          else 
+            vids[i].pause(); 
+        }
+      }
+    </script>
+</head>
+
+<body>
+<!--    <button class="bottom" onclick="play_all();">Play/Pause All</button>-->
+	<button class="bottom" onclick="goTop()" title="Go to top" id=go_top>Top</button>
+	<script>
+	  var mybutton = document.getElementById("go_top");
+	  window.onscroll = function() {
+		if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+		  mybutton.style.display = "block";
+		} else {
+		  mybutton.style.display = "none";
+		}
+	  }
+	  function goTop() {
+		document.body.scrollTop = 0;
+		document.documentElement.scrollTop = 0;
+	  }
+	</script>
+    <div class="container">
+        <h1 name="top" align="center">Self-Distilled StyleGAN: Towards Generation from Interenet Photos</h1>
+        <h2 align="center">Supplementary Material</h2>
+        <h2 align="center">Submission ID 289</h2>
+         
+        <ol>
+            <!-- TODO: #hashtags -->
+      <li><a href="pdf/supplementary_additional_details.pdf" target="_blank">Supplementary PDF - with additional ablation study and implementation details</a></li><br>
+			<li><a href="#cluster_visualizations"><b>Cluster Centers Visualization</b></a></li>
+			<li><a href="#random_samples"><b>Our Results - Random Samples</b></a>
+				<ul>
+					<li><a href="#random_dogs">Dogs</a></li>
+					<li><a href="#random_elephants">Elephants</a></li>
+					<li><a href="#random_lions">Lions</a></li>
+					<li><a href="#random_parrots">Parrots</a></li>
+					<li><a href="#random_bicycles">Bicycles</a></li>
+					<li><a href="#random_giraffes">Giraffes</a></li>
+					<li><a href="#random_horses">Horses (cropped and uncropped)</a></li>
+					<li><a href="#random_plants">Potted Plants</a></li>
+				</ul>
+			</li>
+            <li><a href="#editing"><b>Editing (Section 5.3)</b></a>
+				<ul>
+					<li><a href="#editing_lions">Lions</a></li>
+					<li><a href="#editing_parrots">Parrots</a></li>
+					<li><a href="#editing_horses">Horses</a></li>
+				</ul>
+			</li>
+			<li><a href="#filter_comp"><b>Self-Filtering Qualitative Comparison (Section 5.1)</b></a></li>
+      <li><a href="#user_study"><b>Quantitative Comparisons - User Study (Sections 5.1, 5.2)</b></a></li>
+			
+        </ol>
+        <p align="left">&nbsp;</p>
+
+	  <hr>
+	  <a name="supp"></a>
+	  <div>
+	  <h3 align="left">Supplementary PDF</h3>
+		  <p align="left">For additional ablation studies and implementation details, please see our attached <a href="pdf/supplementary_additional_details.pdf">supplementary PDF file</a>. </p>
+	  </div>
+		<br>
+	  <hr>
+      <a name="cluster_visualizations"></a>
+	  <div>
+	  <h3 align="left">Cluster Center Visualization</h3>
+
+	  <p align="left">We show random walks between our cluster centers in the latent space of various domains (see videos below). As can be seen, the  cluster centers are highly diverse and captures well the multi modal nature of the data.</p>
+	  <p style="color:#FF5959; font-size: 20px;">
+		  <strong>NOTE:<br>
+			  * Click on the "Play/Pause All" button below the videos to play and pause all the videos. <br>
+			  * Click on the videos for viewing them in full size.</strong></p>
+	  <table width="100%" border="0">
+	    <tbody>
+	      <tr>
+			<th align="center" style="font-size: 23px">Lions</th>
+			<th align="center" style="font-size: 23px">Dogs</th>
+			<th align="center" style="font-size: 23px">Parrots</th>
+			<th align="center" style="font-size: 23px">Potted Plant</th>
+          </tr>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="../cluster_interpolation/lions.mp4"><video loop controls src="../cluster_interpolation/lions.mp4" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="../cluster_interpolation/dogs.mp4"><video loop controls src="../cluster_interpolation/dogs.mp4" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="../cluster_interpolation/parrots.mp4"><video loop controls src="../cluster_interpolation/parrots.mp4" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="../cluster_interpolation/potted_plant.mp4"><video loop controls src="../cluster_interpolation/potted_plant.mp4" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>	 
+          </tbody>
+	  </table>
+	   <p align="center"> <button onclick="play_all();">Play/Pause All</button> </p>
+	   <p align="left">&nbsp;</p>
+	</div>
+
+      <hr>
+	  <a name="random_samples"></a>
+	  <div>
+	  <h3 align="left">Our Results - Random Samples</h3>
+	  <p align="left">We show randomly sampled (uncurated) images generated by our method for various domains. The results below were generated using models that were trained for 500k-1500k iterations. </p>
+	<p align="left">We used our multi-modal truncation, with 𝜓=0.5 for the Dogs, Elephants, Lions, Giraffes and Horses domains, and  𝜓=0.5 for the Potted-Plants, Bicycles and Parrots domains.</p>
+	  <p style="color:#FF5959; font-size: 20px;"><strong>NOTE: We reccomend viewing all content in full screen. Click on the images for viewing them in full size.</strong></p>
+	  <a name="random_dogs"></a>
+	  <h4 align="center">Internet Dogs</h4>
+	  <table width="100%" border="0">
+	    <tbody>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/0.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/0.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/1.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/1.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/2.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/2.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/3.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/3.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/4.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/4.jpg" width="200" height="200" alt=""/></a>
+			</th>
+
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/5.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/5.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/6.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/6.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/7.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/7.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/8.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/8.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/9.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/9.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/10.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/10.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/11.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/11.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/12.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/12.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/13.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/13.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/14.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/14.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+		  	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/15.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/15.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/16.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/16.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/17.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/17.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/18.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/18.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/19.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/19.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/20.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/20.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/21.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/21.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/22.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/22.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/23.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/23.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_dogs_filtered_best_1024/24.jpg"><img src="random_samples/grid_dogs_filtered_best_1024/24.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr><th colspan="6"><br><br></th></tr>
+		  <tr>
+        </tbody>
+	  </table>
+      
+	  
+	  <a name="random_elephants"></a>
+	  <h4 align="center">Internet Elephants</h4>
+	  <table width="100%" border="0">
+	    <tbody>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/0.jpg"><img src="random_samples/grid_1024_new_elephants_1024/0.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/1.jpg"><img src="random_samples/grid_1024_new_elephants_1024/1.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/2.jpg"><img src="random_samples/grid_1024_new_elephants_1024/2.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/3.jpg"><img src="random_samples/grid_1024_new_elephants_1024/3.jpg" width="200" height="200" alt=""/></a>
+			</th>
+						<th>
+			  <a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/4.jpg"><img src="random_samples/grid_1024_new_elephants_1024/4.jpg" width="200" height="200" alt=""/></a>
+			</th>
+
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/5.jpg"><img src="random_samples/grid_1024_new_elephants_1024/5.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/6.jpg"><img src="random_samples/grid_1024_new_elephants_1024/6.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/7.jpg"><img src="random_samples/grid_1024_new_elephants_1024/7.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/8.jpg"><img src="random_samples/grid_1024_new_elephants_1024/8.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/9.jpg"><img src="random_samples/grid_1024_new_elephants_1024/9.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/10.jpg"><img src="random_samples/grid_1024_new_elephants_1024/10.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/11.jpg"><img src="random_samples/grid_1024_new_elephants_1024/11.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/12.jpg"><img src="random_samples/grid_1024_new_elephants_1024/12.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/13.jpg"><img src="random_samples/grid_1024_new_elephants_1024/13.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/14.jpg"><img src="random_samples/grid_1024_new_elephants_1024/14.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+		  	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/15.jpg"><img src="random_samples/grid_1024_new_elephants_1024/15.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/16.jpg"><img src="random_samples/grid_1024_new_elephants_1024/16.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/17.jpg"><img src="random_samples/grid_1024_new_elephants_1024/17.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/18.jpg"><img src="random_samples/grid_1024_new_elephants_1024/18.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/19.jpg"><img src="random_samples/grid_1024_new_elephants_1024/19.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/20.jpg"><img src="random_samples/grid_1024_new_elephants_1024/20.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/21.jpg"><img src="random_samples/grid_1024_new_elephants_1024/21.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/22.jpg"><img src="random_samples/grid_1024_new_elephants_1024/22.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/23.jpg"><img src="random_samples/grid_1024_new_elephants_1024/23.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_1024_new_elephants_1024/24.jpg"><img src="random_samples/grid_1024_new_elephants_1024/24.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr><th colspan="6"><br><br></th></tr>
+		  <tr>
+        </tbody>
+	  </table>
+      
+      
+      <a name="random_lions"></a>
+      	  <h4 align="center">Internet Lions</h4>
+	  <table width="100%" border="0">
+	    <tbody>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_lions_filtered/0.jpg"><img src="random_samples/grid_lions_filtered/0.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_lions_filtered/1.jpg"><img src="random_samples/grid_lions_filtered/1.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_lions_filtered/2.jpg"><img src="random_samples/grid_lions_filtered/2.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_lions_filtered/3.jpg"><img src="random_samples/grid_lions_filtered/3.jpg" width="200" height="200" alt=""/></a>
+			</th>
+						<th>
+			  <a style="display: inline-block;" href="random_samples/grid_lions_filtered/4.jpg"><img src="random_samples/grid_lions_filtered/4.jpg" width="200" height="200" alt=""/></a>
+			</th>
+
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_lions_filtered/5.jpg"><img src="random_samples/grid_lions_filtered/5.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_lions_filtered/6.jpg"><img src="random_samples/grid_lions_filtered/6.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_lions_filtered/7.jpg"><img src="random_samples/grid_lions_filtered/7.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_lions_filtered/8.jpg"><img src="random_samples/grid_lions_filtered/8.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_lions_filtered/9.jpg"><img src="random_samples/grid_lions_filtered/9.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_lions_filtered/10.jpg"><img src="random_samples/grid_lions_filtered/10.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_lions_filtered/11.jpg"><img src="random_samples/grid_lions_filtered/11.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_lions_filtered/12.jpg"><img src="random_samples/grid_lions_filtered/12.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_lions_filtered/13.jpg"><img src="random_samples/grid_lions_filtered/13.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_lions_filtered/14.jpg"><img src="random_samples/grid_lions_filtered/14.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+		  	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_lions_filtered/15.jpg"><img src="random_samples/grid_lions_filtered/15.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_lions_filtered/16.jpg"><img src="random_samples/grid_lions_filtered/16.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_lions_filtered/17.jpg"><img src="random_samples/grid_lions_filtered/17.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_lions_filtered/18.jpg"><img src="random_samples/grid_lions_filtered/18.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_lions_filtered/19.jpg"><img src="random_samples/grid_lions_filtered/19.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_lions_filtered/20.jpg"><img src="random_samples/grid_lions_filtered/20.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_lions_filtered/21.jpg"><img src="random_samples/grid_lions_filtered/21.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_lions_filtered/22.jpg"><img src="random_samples/grid_lions_filtered/22.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_lions_filtered/23.jpg"><img src="random_samples/grid_lions_filtered/23.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_lions_filtered/24.jpg"><img src="random_samples/grid_lions_filtered/24.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr><th colspan="6"><br><br></th></tr>
+		  <tr>
+        </tbody>
+	  </table>
+      
+      
+      <a name="random_parrots"></a>
+      	  <h4 align="center">Internet Parrots</h4>
+	  <table width="100%" border="0">
+	    <tbody>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/0.jpg"><img src="random_samples/grid_parrots_filtered_best/0.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/1.jpg"><img src="random_samples/grid_parrots_filtered_best/1.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/2.jpg"><img src="random_samples/grid_parrots_filtered_best/2.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/3.jpg"><img src="random_samples/grid_parrots_filtered_best/3.jpg" width="200" height="200" alt=""/></a>
+			</th>
+						<th>
+			  <a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/4.jpg"><img src="random_samples/grid_parrots_filtered_best/4.jpg" width="200" height="200" alt=""/></a>
+			</th>
+
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/5.jpg"><img src="random_samples/grid_parrots_filtered_best/5.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/6.jpg"><img src="random_samples/grid_parrots_filtered_best/6.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/7.jpg"><img src="random_samples/grid_parrots_filtered_best/7.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/8.jpg"><img src="random_samples/grid_parrots_filtered_best/8.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/9.jpg"><img src="random_samples/grid_parrots_filtered_best/9.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/10.jpg"><img src="random_samples/grid_parrots_filtered_best/10.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/11.jpg"><img src="random_samples/grid_parrots_filtered_best/11.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/12.jpg"><img src="random_samples/grid_parrots_filtered_best/12.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/13.jpg"><img src="random_samples/grid_parrots_filtered_best/13.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/14.jpg"><img src="random_samples/grid_parrots_filtered_best/14.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+		  	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/15.jpg"><img src="random_samples/grid_parrots_filtered_best/15.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/16.jpg"><img src="random_samples/grid_parrots_filtered_best/16.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/17.jpg"><img src="random_samples/grid_parrots_filtered_best/17.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/18.jpg"><img src="random_samples/grid_parrots_filtered_best/18.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/19.jpg"><img src="random_samples/grid_parrots_filtered_best/19.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/20.jpg"><img src="random_samples/grid_parrots_filtered_best/20.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/21.jpg"><img src="random_samples/grid_parrots_filtered_best/21.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/22.jpg"><img src="random_samples/grid_parrots_filtered_best/22.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/23.jpg"><img src="random_samples/grid_parrots_filtered_best/23.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_parrots_filtered_best/24.jpg"><img src="random_samples/grid_parrots_filtered_best/24.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr><th colspan="6"><br><br></th></tr>
+		  <tr>
+        </tbody>
+	  </table>
+	  
+	  
+	  
+      <a name="random_bicycles"></a>
+      	  <h4 align="center">LSUN-Bicycle</h4>
+	  <table width="100%" border="0">
+	    <tbody>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/0.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/0.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/1.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/1.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/2.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/2.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/3.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/3.jpg" width="200" height="200" alt=""/></a>
+			</th>
+						<th>
+			  <a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/4.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/4.jpg" width="200" height="200" alt=""/></a>
+			</th>
+
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/5.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/5.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/6.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/6.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/7.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/7.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/8.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/8.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/9.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/9.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/10.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/10.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/11.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/11.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/12.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/12.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/13.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/13.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/14.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/14.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+		  	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/15.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/15.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/16.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/16.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/17.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/17.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/18.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/18.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/19.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/19.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/20.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/20.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/21.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/21.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/22.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/22.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/23.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/23.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_bicycle_filtered_1500K/24.jpg"><img src="random_samples/grid_bicycle_filtered_1500K/24.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr><th colspan="6"><br><br></th></tr>
+		  <tr>
+        </tbody>
+	  </table>
+	  
+	  
+	  
+      <a name="random_giraffes"></a>
+      	  <h4 align="center">Internet Giraffes</h4>
+	  <table width="100%" border="0">
+	    <tbody>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/0.jpg"><img src="random_samples/grid_giraffes_512_2/0.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/1.jpg"><img src="random_samples/grid_giraffes_512_2/1.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/2.jpg"><img src="random_samples/grid_giraffes_512_2/2.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/3.jpg"><img src="random_samples/grid_giraffes_512_2/3.jpg" width="200" height="200" alt=""/></a>
+			</th>
+						<th>
+			  <a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/4.jpg"><img src="random_samples/grid_giraffes_512_2/4.jpg" width="200" height="200" alt=""/></a>
+			</th>
+
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/5.jpg"><img src="random_samples/grid_giraffes_512_2/5.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/6.jpg"><img src="random_samples/grid_giraffes_512_2/6.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/7.jpg"><img src="random_samples/grid_giraffes_512_2/7.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/8.jpg"><img src="random_samples/grid_giraffes_512_2/8.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/9.jpg"><img src="random_samples/grid_giraffes_512_2/9.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/10.jpg"><img src="random_samples/grid_giraffes_512_2/10.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/11.jpg"><img src="random_samples/grid_giraffes_512_2/11.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/12.jpg"><img src="random_samples/grid_giraffes_512_2/12.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/13.jpg"><img src="random_samples/grid_giraffes_512_2/13.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/14.jpg"><img src="random_samples/grid_giraffes_512_2/14.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+		  	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/15.jpg"><img src="random_samples/grid_giraffes_512_2/15.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/16.jpg"><img src="random_samples/grid_giraffes_512_2/16.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/17.jpg"><img src="random_samples/grid_giraffes_512_2/17.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/18.jpg"><img src="random_samples/grid_giraffes_512_2/18.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/19.jpg"><img src="random_samples/grid_giraffes_512_2/19.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/20.jpg"><img src="random_samples/grid_giraffes_512_2/20.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/21.jpg"><img src="random_samples/grid_giraffes_512_2/21.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/22.jpg"><img src="random_samples/grid_giraffes_512_2/22.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/23.jpg"><img src="random_samples/grid_giraffes_512_2/23.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_giraffes_512_2/24.jpg"><img src="random_samples/grid_giraffes_512_2/24.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr><th colspan="6"><br><br></th></tr>
+		  <tr>
+        </tbody>
+	  </table>
+	  
+      <a name="random_horses"></a>
+      	  <h4 align="center">LSUN-Horse</h4>
+	  <table width="100%" border="0">
+	    <tbody>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/0.jpg"><img src="random_samples/grid_horses_filtered_1500K/0.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/1.jpg"><img src="random_samples/grid_horses_filtered_1500K/1.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/2.jpg"><img src="random_samples/grid_horses_filtered_1500K/2.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/3.jpg"><img src="random_samples/grid_horses_filtered_1500K/3.jpg" width="200" height="200" alt=""/></a>
+			</th>
+						<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/4.jpg"><img src="random_samples/grid_horses_filtered_1500K/4.jpg" width="200" height="200" alt=""/></a>
+			</th>
+
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/5.jpg"><img src="random_samples/grid_horses_filtered_1500K/5.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/6.jpg"><img src="random_samples/grid_horses_filtered_1500K/6.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/7.jpg"><img src="random_samples/grid_horses_filtered_1500K/7.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/8.jpg"><img src="random_samples/grid_horses_filtered_1500K/8.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/9.jpg"><img src="random_samples/grid_horses_filtered_1500K/9.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/10.jpg"><img src="random_samples/grid_horses_filtered_1500K/10.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/11.jpg"><img src="random_samples/grid_horses_filtered_1500K/11.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/12.jpg"><img src="random_samples/grid_horses_filtered_1500K/12.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/13.jpg"><img src="random_samples/grid_horses_filtered_1500K/13.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/14.jpg"><img src="random_samples/grid_horses_filtered_1500K/14.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+		  	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/15.jpg"><img src="random_samples/grid_horses_filtered_1500K/15.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/16.jpg"><img src="random_samples/grid_horses_filtered_1500K/16.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/17.jpg"><img src="random_samples/grid_horses_filtered_1500K/17.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/18.jpg"><img src="random_samples/grid_horses_filtered_1500K/18.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/19.jpg"><img src="random_samples/grid_horses_filtered_1500K/19.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/20.jpg"><img src="random_samples/grid_horses_filtered_1500K/20.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/21.jpg"><img src="random_samples/grid_horses_filtered_1500K/21.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/22.jpg"><img src="random_samples/grid_horses_filtered_1500K/22.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/23.jpg"><img src="random_samples/grid_horses_filtered_1500K/23.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_filtered_1500K/24.jpg"><img src="random_samples/grid_horses_filtered_1500K/24.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr><th colspan="6"><br><br></th></tr>
+		  <tr>
+        </tbody>
+	  </table>
+      
+      
+      
+      <a name="random_horses_uncropped"></a>
+      	  <h4 align="center">LSUN-Horse Uncropped (i.e. without cropping the main objects from each image in the dataset)</h4>
+	  <table width="100%" border="0">
+	    <tbody>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/0.jpg"><img src="random_samples/grid_horses_uncropped_1500K/0.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/1.jpg"><img src="random_samples/grid_horses_uncropped_1500K/1.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/2.jpg"><img src="random_samples/grid_horses_uncropped_1500K/2.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/3.jpg"><img src="random_samples/grid_horses_uncropped_1500K/3.jpg" width="200" height="200" alt=""/></a>
+			</th>
+						<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/4.jpg"><img src="random_samples/grid_horses_uncropped_1500K/4.jpg" width="200" height="200" alt=""/></a>
+			</th>
+
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/5.jpg"><img src="random_samples/grid_horses_uncropped_1500K/5.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/6.jpg"><img src="random_samples/grid_horses_uncropped_1500K/6.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/7.jpg"><img src="random_samples/grid_horses_uncropped_1500K/7.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/8.jpg"><img src="random_samples/grid_horses_uncropped_1500K/8.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/9.jpg"><img src="random_samples/grid_horses_uncropped_1500K/9.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/10.jpg"><img src="random_samples/grid_horses_uncropped_1500K/10.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/11.jpg"><img src="random_samples/grid_horses_uncropped_1500K/11.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/12.jpg"><img src="random_samples/grid_horses_uncropped_1500K/12.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/13.jpg"><img src="random_samples/grid_horses_uncropped_1500K/13.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/14.jpg"><img src="random_samples/grid_horses_uncropped_1500K/14.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+		  	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/15.jpg"><img src="random_samples/grid_horses_uncropped_1500K/15.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/16.jpg"><img src="random_samples/grid_horses_uncropped_1500K/16.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/17.jpg"><img src="random_samples/grid_horses_uncropped_1500K/17.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/18.jpg"><img src="random_samples/grid_horses_uncropped_1500K/18.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/19.jpg"><img src="random_samples/grid_horses_uncropped_1500K/19.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/20.jpg"><img src="random_samples/grid_horses_uncropped_1500K/20.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/21.jpg"><img src="random_samples/grid_horses_uncropped_1500K/21.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/22.jpg"><img src="random_samples/grid_horses_uncropped_1500K/22.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/23.jpg"><img src="random_samples/grid_horses_uncropped_1500K/23.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_horses_uncropped_1500K/24.jpg"><img src="random_samples/grid_horses_uncropped_1500K/24.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr><th colspan="6"><br><br></th></tr>
+		  <tr>
+        </tbody>
+	  </table>
+	  		<a name="random_plants"></a>
+	        	  <h4 align="center">LSUN-Potted plants</h4>
+	  <table width="100%" border="0">
+	    <tbody>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/0.jpg"><img src="random_samples/grid_potted_plants_500K/0.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/1.jpg"><img src="random_samples/grid_potted_plants_500K/1.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/2.jpg"><img src="random_samples/grid_potted_plants_500K/2.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/3.jpg"><img src="random_samples/grid_potted_plants_500K/3.jpg" width="200" height="200" alt=""/></a>
+			</th>
+						<th>
+			  <a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/4.jpg"><img src="random_samples/grid_potted_plants_500K/4.jpg" width="200" height="200" alt=""/></a>
+			</th>
+
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/5.jpg"><img src="random_samples/grid_potted_plants_500K/5.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/6.jpg"><img src="random_samples/grid_potted_plants_500K/6.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/7.jpg"><img src="random_samples/grid_potted_plants_500K/7.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/8.jpg"><img src="random_samples/grid_potted_plants_500K/8.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/9.jpg"><img src="random_samples/grid_potted_plants_500K/9.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/10.jpg"><img src="random_samples/grid_potted_plants_500K/10.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/11.jpg"><img src="random_samples/grid_potted_plants_500K/11.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/12.jpg"><img src="random_samples/grid_potted_plants_500K/12.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/13.jpg"><img src="random_samples/grid_potted_plants_500K/13.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/14.jpg"><img src="random_samples/grid_potted_plants_500K/14.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+		  	        <th>
+			  <a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/15.jpg"><img src="random_samples/grid_potted_plants_500K/15.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/16.jpg"><img src="random_samples/grid_potted_plants_500K/16.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/17.jpg"><img src="random_samples/grid_potted_plants_500K/17.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/18.jpg"><img src="random_samples/grid_potted_plants_500K/18.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/19.jpg"><img src="random_samples/grid_potted_plants_500K/19.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+				<a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/20.jpg"><img src="random_samples/grid_potted_plants_500K/20.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/21.jpg"><img src="random_samples/grid_potted_plants_500K/21.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/22.jpg"><img src="random_samples/grid_potted_plants_500K/22.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/23.jpg"><img src="random_samples/grid_potted_plants_500K/23.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="random_samples/grid_potted_plants_500K/24.jpg"><img src="random_samples/grid_potted_plants_500K/24.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+		  <tr><th colspan="6"><br><br></th></tr>
+		  <tr>
+        </tbody>
+	  </table>
+	  
+      </div>
+	  <br>
+	  <hr>
+	  <a name="editing"></a>
+	  <div>
+	  <h3 align="left">Editing (Section 5.3)</h3>
+	  <p align="left">We show additional results for semantic image editing using our trained models. Here we visualize as animated GIFs a few editing directions we extracted in W space and in Style-Space of StyleGAN. As can be seen below, our method preserves StyleGAN's remarkable semantic editing capabilities in challenging, multi-modal domains.</p>
+	  <p style="color:#FF5959; font-size: 20px;"><strong>NOTE: We reccomend viewing all content in full screen. Click on the images for viewing them in full size.</strong></p>
+	  <a name="editing_lions"></a>
+      <h4 align="center">Lions</h4>
+	  <table width="100%" border="0">
+	    <tbody>
+	      <tr>
+			<th colspan="4" align="center" style="font-size: 23px">Add / Remove Mane</th>
+          </tr>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="editing/lions/mane/001.gif"><img src="editing/lions/mane/001.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/mane/006.gif"><img src="editing/lions/mane/006.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/mane/009.gif"><img src="editing/lions/mane/009.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/mane/0011.gif"><img src="editing/lions/mane/011.gif" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="editing/lions/mane/135.gif"><img src="editing/lions/mane/135.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/lions/mane/020.gif"><img src="editing/lions/mane/020.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/lions/mane/024.gif"><img src="editing/lions/mane/024.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/lions/mane/0028.gif"><img src="editing/lions/mane/028.gif" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="editing/lions/mane/039.gif"><img src="editing/lions/mane/039.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/lions/mane/048.gif"><img src="editing/lions/mane/048.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/lions/mane/053.gif"><img src="editing/lions/mane/053.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/lions/mane/0065.gif"><img src="editing/lions/mane/065.gif" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+				<a style="display: inline-block;" href="editing/lions/mane/075.gif"><img src="editing/lions/mane/075.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/lions/mane/096.gif"><img src="editing/lions/mane/096.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/lions/mane/098.gif"><img src="editing/lions/mane/098.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/lions/mane/122.mp4"><img src="editing/lions/mane/122.gif" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>
+		  <tr><th colspan="4"><br><br></th></tr>
+  		  <tr>
+			<th colspan="4" align="center" style="font-size: 23px">Head Pane Rotation</th>
+          </tr>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="editing/lions/head_turn/004.gif"><img src="editing/lions/head_turn/004.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/head_turn/009.gif"><img src="editing/lions/head_turn/009.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/head_turn/010.gif"><img src="editing/lions/head_turn/010.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/head_turn/020.gif"><img src="editing/lions/head_turn/020.gif" width="256" height="256" alt=""/></a>
+			</th>
+			
+          </tr>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="editing/lions/head_turn/024.gif"><img src="editing/lions/head_turn/024.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/head_turn/030.gif"><img src="editing/lions/head_turn/030.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/lions/head_turn/033.gif"><img src="editing/lions/head_turn/033.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/head_turn/038.gif"><img src="editing/lions/head_turn/038.gif" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/head_turn/039.gif"><img src="editing/lions/head_turn/039.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/head_turn/046.gif"><img src="editing/lions/head_turn/046.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/lions/head_turn/048.gif"><img src="editing/lions/head_turn/048.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/head_turn/055.gif"><img src="editing/lions/head_turn/055.gif" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/head_turn/065.gif"><img src="editing/lions/head_turn/065.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/head_turn/075.gif"><img src="editing/lions/head_turn/075.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/head_turn/095.gif"><img src="editing/lions/head_turn/095.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/head_turn/127.gif"><img src="editing/lions/head_turn/127.gif" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>
+
+		  <tr><th colspan="4"><br><br></th></tr>
+		  		  <tr>
+			<th colspan="4" align="center" style="font-size: 23px">Roaring</th>
+          </tr>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="editing/lions/roar - styleclip/roaring1.gif"><img src="editing/lions/roar - styleclip/roaring1.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/roar - styleclip/roaring2.gif"><img src="editing/lions/roar - styleclip/roaring2.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/roar - styleclip/roaring3.gif"><img src="editing/lions/roar - styleclip/roaring3.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/roar - styleclip/roaring4.gif"><img src="editing/lions/roar - styleclip/roaring4.gif" width="256" height="256" alt=""/></a>
+			</th>
+			
+          </tr>
+		  <tr>
+	        <th>
+				<a style="display: inline-block;" href="editing/lions/mouth/135.gif"><img src="editing/lions/roar - styleclip/roaring5.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/mouth/159.gif"><img src="editing/lions/roar - styleclip/roaring6.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/mouth/157.gif"><img src="editing/lions/roar - styleclip/roaring7.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="editing/lions/mouth/053.gif"><img src="editing/lions/roar - styleclip/roaring8.gif" width="256" height="256" alt=""/></a>
+			</th>
+			
+          </tr>
+
+		  
+        </tbody>
+	  </table>
+	  <a name="editing_parrots"></a>
+	  <h4 align="center">Parrots</h4>
+	  <table width="100%" border="0">
+	    <tbody>
+	      <tr>
+			<th colspan="4" align="center" style="font-size: 23px">Head Pan Rotation</th>
+          </tr>
+	      <tr>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/head_pan/092.gif"><img src="editing/parrots/head_pan/091.gif" width="256" height="256" alt=""/></a>
+			</th>
+	        
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/head_pan/005.gif"><img src="editing/parrots/head_pan/005.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/head_pan/102.gif"><img src="editing/parrots/head_pan/102.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/head_pan/017.gif"><img src="editing/parrots/head_pan/017.gif" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+				<a style="display: inline-block;" href="editing/parrots/head_pan/021.gif"><img src="editing/parrots/head_pan/021.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/head_pan/023.gif"><img src="editing/parrots/head_pan/023.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/head_pan/152.gif"><img src="editing/parrots/head_pan/152.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/head_pan/043.gif"><img src="editing/parrots/head_pan/043.gif" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>
+		  <tr>
+	        <th>
+				<a style="display: inline-block;" href="editing/parrots/head_pan/045.gif"><img src="editing/parrots/head_pan/045.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/head_pan/078.gif"><img src="editing/parrots/head_pan/078.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/head_pan/142.gif"><img src="editing/parrots/head_pan/142.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/head_pan/083.gif"><img src="editing/parrots/head_pan/083.gif" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>
+		  <tr><th colspan="4"><br><br></th></tr>
+		  <tr>
+			<th colspan="4" align="center" style="font-size: 23px">Beak Color</th>
+          </tr>
+	      <tr>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/beak_color/018.gif"><img src="editing/parrots/beak_color/018.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/beak_color/068.gif"><img src="editing/parrots/beak_color/068.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/beak_color/088.gif"><img src="editing/parrots/beak_color/088.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/beak_color/124.gif"><img src="editing/parrots/beak_color/124.gif" width="256" height="256" alt=""/></a>
+			</th>
+		  </tr>
+		  <tr><th colspan="4"><br><br></th></tr>
+		  <tr>
+			<th colspan="4" align="center" style="font-size: 23px">Zoom In/Out</th>
+          </tr>
+	      <tr>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/closeup/048.gif"><img src="editing/parrots/closeup/048.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/closeup/078.gif"><img src="editing/parrots/closeup/078.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/closeup/090.gif"><img src="editing/parrots/closeup/090.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/parrots/closeup/124.gif"><img src="editing/parrots/closeup/124.gif" width="256" height="256" alt=""/></a>
+			</th>
+		  </tr>
+        </tbody>
+	  </table>
+	  <a name="editing_horses"></a>
+	  <h4 align="center">Horses</h4>
+	  <table width="100%" border="0">
+	    <tbody>
+	      <tr>
+			<th colspan="4" align="center" style="font-size: 23px">Head Pan Rotation</th>
+          </tr>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="editing/horse/head_pan/015.gif"><img src="editing/horse/head_pan/015.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/horse/head_pan/023.gif"><img src="editing/horse/head_pan/023.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/horse/head_pan/088.gif"><img src="editing/horse/head_pan/088.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/horse/head_pan/108.gif"><img src="editing/horse/head_pan/108.gif" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>
+		  <tr><th colspan="4"><br><br></th></tr>
+		  <tr>
+			<th colspan="4" align="center" style="font-size: 23px">Horse Color (White / Brown)</th>
+          </tr>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="editing/horse/white/000.gif"><img src="editing/horse/white/000.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/horse/white/007.gif"><img src="editing/horse/white/007.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/horse/white/039.gif"><img src="editing/horse/white/039.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/horse/white/046.gif"><img src="editing/horse/white/046.gif" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>
+		  <tr><th colspan="4"><br><br></th></tr>
+		  <tr>
+			<th colspan="4" align="center" style="font-size: 23px">Horse Running / Standing Still</th>
+          </tr>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="editing/horse/running/000.gif"><img src="editing/horse/running/000.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/horse/running/072.gif"><img src="editing/horse/running/072.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/horse/running/007.gif"><img src="editing/horse/running/007.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/horse/running/089.gif"><img src="editing/horse/running/089.gif" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>
+		  <tr><th colspan="4"><br><br></th></tr>
+		  <tr>
+			<th colspan="4" align="center" style="font-size: 23px">Head Up / Down</th>
+          </tr>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="editing/horse/head_down/023.gif"><img src="editing/horse/head_down/023.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/horse/head_down/046.gif"><img src="editing/horse/head_down/046.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/horse/head_down/087.gif"><img src="editing/horse/head_down/087.gif" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="editing/horse/head_down/104.gif"><img src="editing/horse/head_down/104.gif" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>
+		  <tr><th colspan="6"><br><br></th></tr>
+        </tbody>
+	  </table>
+	  
+	  </div>
+ 
+	  <hr>
+      <a name="filter_comp"></a>
+	  <div>
+	  <h3 align="left">Self-Filtering Qualitative Comparison (Section 5.1)</h3>
+	  <p align="left">We show additional results of random images generated by: StyleGAN trained on unfiltered data (left), and StyleGAN trained on data self-filtered by our method (right). For fair comparison, we trained both models the same number of iterations (500k iterations).</p>
+	  <p><br></p>
+	  <h4 align="center">LSUN-Horse</h4>
+	  <img src="filtering_comparison/filtering_comparison_horses.png" width="100%"/>
+	  <p><br></p>
+	  <h4 align="center">Internet Parrots</h4>
+	  <img src="filtering_comparison/filtering_comparison_Parrots.png" width="100%"/>
+	  <p><br></p>
+	  <h4 align="center">Internet Bikes</h4>
+	  <img src="filtering_comparison/filtering_comparison_bikes.png" width="100%"/>
+	  <p><br></p>
+      <h4 align="center">Internet Elephants</h4>
+	  <img src="filtering_comparison/filtering_comparison_elephants.png" width="100%"/>
+	  <p><br></p>
+      <hr>
+	  </div>
+	  <a name="user_study"></a>
+	  <div>
+	  <h3 align="left">Quantitative Comparisons - User Study (Sections 5.1, 5.2)</h3>
+	  <h4 align="left">Realism User Study</h4>
+	  <p align="left">
+		We further evaluate the realism and visual quality of our results by performing an extensive user study using Amazon Mechanical Turk (AMT). We follow a typical protocol used for evaluating the overall realism and quality of images generated in an unconditional manner: a single image is displayed for 1.5 seconds, after which the participant decides whether the image is real or fake. Each rater receives 60 randomly picked images, out of which: 20 were synthesized by StyleGAN generator trained on the filtered subset, 20 synthesized by the generator trained on the unfiltered collection, and 20 real images. We filter the results of raters who failed 2 or more vigilance tests, or marked more than 40% of the real images as fake. Finally, we report the percentage of images marked as real for each generator.
+		  
+	  	<br /> <br />
+	  	The following is an illustration of the realism user study.
+	  </p>
+
+	  <table>
+      	<tr align='center'>
+      		<td>Image displayed for 1.5 seconds</td><td></td><td>Real/Fake selection</td>
+      	</tr>
+      	<tr>
+      		<td>
+      			<!-- <a style="display: inline-block;" href="num_clusters/horses/16_no_trunc.jpg"> -->
+      			<img style="display: inline-block;" src="user_study/realism.jpg" width="384px" height="384px" alt=""/>
+      		<!-- </a> -->
+      		</td>
+      		<td>
+      			<img style="display: inline-block; padding-left: 50px;padding-right: 50px;" src="user_study/arrow.png" width="70px" height="70px" alt=""/>
+      		</td>
+      		<td style="padding-top: 150px;">
+      			<div align='center'>
+      				Was the image real or fake? <br /><br /><br />
+      			<div style="height:200px; width:200px; display:inline-block; border:0px solid black;">
+				  <div style="position:relative; width:100%; height:20%"><button type="button" onclick="" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index: 10; font-size:14pt border: 1px solid #CCC; border-radius: 10px; background-color: #CCC; padding-top: 12px;">Real</button>
+				</div></div>
+				<div style="height:200px; width:200px; display:inline-block; border:0px solid black;">
+				  <div id="buttonA" style="position:relative; width:100%; height:20%; border-width: 1px; color: black;"><button type="button" onclick="" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index: 10; font-size:14pt border: 1px solid #CCC; border-radius: 10px; background-color: #CCC; padding-top: 12px;">Fake</button>
+				</div></div>
+				</div>
+      		</td>
+      	</tr>
+      </table>
+
+<br />
+<h4 align="left">Truncation Comparison User Study</h4>
+<p>
+	The goal of this test is to compare the image quality under different truncation methods. In each study, the outcome of the compared methods are presented side-by-side without a time limit. The participants are asked to choose the most realistic image. Each rater is given a random subset of 20 such questions (images in each question are all originated from the same latent code) with random order between the different methods.
+
+	<br /><br />
+	The following is the template displayed to the raters when comparing 3 methods: no truncation, mean truncation, and our truncation.
+</p>
+
+
+	  <br />
+	  <h5 align="center">Which image looks more <b>realistic</b>? <br />Look for artifacts in the main object or its surrounding.</h5>
+	  <div width = "100%" align = "center">
+		<div style="height:256px; width:256px; display:inline-block; border:0px solid black;">
+		  <img src="user_study/triplet_no_trunc.jpg" width="256px" height="256px" alt=""/> <br /><br />
+		  <div style="position:relative; width:100%; height:10%"><button type="button" onclick="" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index: 10; font-size:14pt border: 1px solid #CCC; border-radius: 10px; background-color: #CCC; padding-top: 5px;">Left image</button>
+		</div></div>
+		<div style="height:256px; width:256px; display:inline-block; border:0px solid black;">
+		  <img src="user_study/triplet_avg.jpg" width="256px" height="256px" alt=""/> <br /><br />
+		  <div style="position:relative; width:100%; height:10%"><button type="button" onclick="" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index: 10; font-size:14pt border: 1px solid #CCC; border-radius: 10px; background-color: #CCC; padding-top: 5px;">Middle image</button>
+		</div></div>
+		<div style="height:256px; width:256px; display:inline-block; border:0px solid black;">
+		  <img src="user_study/triplet_ours.jpg" width="256px" height="256px" alt=""/>  <br /><br />
+		  <div style="position:relative; width:100%; height:10%; border-width: 1px; color: black;"><button type="button" onclick="" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index: 10; font-size:14pt border: 1px solid #CCC; border-radius: 10px; background-color: #CCC; padding-top: 5px;">Right image</button>
+		</div></div>
+	  </div>
+	  <br /> <br /> <br />
+     <p>And the following is the template displayed to the raters when comparing mean clamping and our method.</p>
+     <h5 align="center">Which image looks more <b>realistic</b>? <br />Look for artifacts in the main object or its surrounding.</h5>
+	  <div width = "100%" align = "center">
+		<div style="height:256px; width:256px; display:inline-block; border:0px solid black;">
+			<img src="user_study/paired_clamp.jpg" width="256px" height="256px" alt=""/> <br /><br />
+		  <div style="position:relative; width:100%; height:10%"><button type="button" onclick="" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index: 10; font-size:14pt border: 1px solid #CCC; border-radius: 10px; background-color: #CCC; padding-top: 5px;">Left image</button>
+		</div></div>
+		<div style="height:256px; width:256px; display:inline-block; border:0px solid black;">
+			<img src="user_study/paired_ours.jpg" width="256px" height="256px" alt=""/>  <br /><br />
+		  <div id="buttonA" style="position:relative; width:100%; height:10%; border-width: 1px; color: black;"><button type="button" onclick="" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index: 10; font-size:14pt border: 1px solid #CCC; border-radius: 10px; background-color: #CCC; padding-top: 5px;">Right image</button>
+		</div></div>
+	  </div> <br /> <br />
+
+
+</body>
+
+</html>
