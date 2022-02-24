@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>
+        Self-Distilled StyleGAN: Towards Generation from Internet Photos
+
+    </title>
+
+	<link rel="stylesheet" type="text/css" href="slick/slick.css"/>
+	<link rel="stylesheet" type="text/css" href="slick/slick-theme.css"/>
+	<link href="css/index.css" rel="stylesheet" type="text/css">    
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VGGHKHHZM6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-VGGHKHHZM6');
+              function play_vid(tag) {
+        vid = document.getElementById(tag)
+        if (vid.paused) 
+          vid.play();
+        else 
+          vid.pause(); 
+      }
+      function play_all() {
+        vids = document.getElementsByTagName('video')
+        play = vids[0].paused
+        for (i = 0; i < vids.length; i++) {
+          if (play) {
+            vids[i].play(); 
+          }
+          else 
+            vids[i].pause(); 
+        }
+      }
+    </script>
+
+
+
+</head>
+<body>
+<!--    <button class="bottom" onclick="play_all();">Play/Pause All</button>-->
+    <p><span class="title">Self-Distilled StyleGAN: Towards Generation from Internet Photos</span></p>
+    <br>
+    <p class="author">
+    	<span class="author"><a target="_blank" href="https://rmokady.github.io/">Ron Mokady</a></span>
+        <span class="author"><a target="_blank" href="mailto:michalyarom@google.com">Michal Yarom</a>&nbsp;<sup></sup></span>
+	<span class="author"><a target="_blank" href="mailto:omertov@google.com">Omer Tov</a>&nbsp;<sup></sup></span>
+	<span class="author"><a target="_blank" href="https://research.google/people/105975/">Oran Lang</a>&nbsp;<sup></sup></span>
+        <br>
+	<span class="author"><a target="_blank" href="https://danielcohenor.com/">Daniel Cohen-Or</a></span>
+	<span class="author"><a target="_blank" href="https://www.weizmann.ac.il/math/dekel/">Tali Dekel</a></span>
+        <span class="author"><a target="_blank" href="http://www.weizmann.ac.il/math/irani/">Michal Irani</a></span>
+        <span class="author"><a target="_blank" href="https://research.google.com/pubs/InbarMosseri.html">Inbar Mosseri</a></span>
+    </p>
+    <br>
+    <table border="0" align="center" class="affiliations">
+        <tbody>
+            <tr>
+                <td colspan="4" align="center" style="font-size: 18px; vertical-align: super;"><img src="images/logo_research.png" height="40" style="vertical-align:middle" alt="">&nbsp;&nbsp;<a href="https://research.google.com/">Google Research</a></td>
+            </tr>
+        </tbody>
+    </table>
+	<br>
+	<table width="999" border="0" align="center" class="menu">
+      <tbody>
+        <tr>
+          <td align="center">| <a href="#paper">Paper</a> | <a href="#video">Video</a> | <a href="#sm">Supplementary Material</a> | <a href="#code">Datasets and Code</a> |</td>
+        </tr>
+      </tbody>
+    </table>
+	<br>
+	<br>
+	
+	<div class="pc">
+    <div class="carousel-images" data-slick='{"slidesToShow": 3, 
+                                                "slidesToScroll": 3,
+											 	"autoplay": true,
+											 	"arrows": false,
+												"dots": true,
+                                                "autoplaySpeed": 2000}'> 
+
+			<a style="display: inline-block;" href="carossel/Parrots_9.png"><img src="carossel/Parrots_9.png" width="320" height="320"/></a>
+			<a style="display: inline-block;" href="carossel/Parrots_81.png"><img src="carossel/Parrots_81.png" width="320" height="320" alt=""/></a> 
+			<a style="display: inline-block;" href="carossel/Parrots_78.png"><img src="carossel/Parrots_78.png" width="320" height="320" alt=""/></a> 
+			<a style="display: inline-block;" href="carossel/Lions_26.png"><img src="carossel/Lions_26.png" width="320" height="320"/></a>
+			<a style="display: inline-block;" href="carossel/Lions_49.png"><img src="carossel/Lions_49.png" width="320" height="320"/></a>
+			<a style="display: inline-block;" href="carossel/Lions_4.png"><img src="carossel/Lions_4.png" width="320" height="320"/></a>
+		    <a style="display: inline-block;" href="carossel/Bikes_19.png"><img src="carossel/Bikes_19.png" width="320" height="320"/></a>
+			<a style="display: inline-block;" href="carossel/Bikes_59.png"><img src="carossel/Bikes_59.png" width="320" height="320"/></a>
+			<a style="display: inline-block;" href="carossel/Bikes_27.png"><img src="carossel/Bikes_27.png" width="320" height="320"/></a>
+			<a style="display: inline-block;" href="carossel/Elephants_32.png"><img src="carossel/Elephants_32.png" width="320" height="320"/></a>
+			<a style="display: inline-block;" href="carossel/Elephants_52.png"><img src="carossel/Elephants_52.png" width="320" height="320"/></a>
+			<a style="display: inline-block;" href="carossel/elephants_70.png"><img src="carossel/elephants_70.png" width="320" height="320"/></a>
+			
+     </div>
+	 </div>
+	
+     <div class="container">
+	
+<!--
+	 <p><span class="section">TL;DR</span></p>
+     <p>We successfully train StyleGAN over challenging internet photos, retaining its remarkable editing capabilities. Before the training, we only use the generator itself to filter the noisy data. After the training, We employ a novel truncation approach to handle the multi-modality..<br> </p>
+-->
+     <p><span class="section">Abstract</span></p>
+	<p>StyleGAN is known to produce high-fidelity images, while also offering unprecedented semantic editing. However, these fascinating abilities have been demonstrated only on a limited set of datasets, which are usually structurally aligned and well curated. In this paper, we show how StyleGAN can be adapted to work on raw uncurated images collected from the Internet. Such image collections impose two main challenges to StyleGAN: they contain many outlier images, and are characterized by a multi-modal distribution. Training StyleGAN on such raw image collections results in degraded image synthesis quality. To meet these challenges, we proposed a StyleGAN-based self-distillation approach, which consists of two main components: (i) A generative-based self-filtering of the dataset to eliminate outlier images, in order to generate an adequate training set, and (ii) Perceptual clustering of the generated images to detect the inherent data modalities, which are then employed to improve StyleGAN's "truncation trick" in the image synthesis process. The presented technique enables the generation of high-quality images, while minimizing the loss in diversity of the data. Through qualitative and quantitative evaluation, we demonstrate the power of our approach to new challenging and diverse domains collected from the Internet.<br></p>
+
+	<p class="section">&nbsp;</p>
+	  <table width="200" border="0" align="center" id="video">
+		<tbody>
+		  <tr>
+<!--
+			<td><iframe width="900" height="506" src="https://www.youtube.com/embed/wLk2eBdXH4M" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+			</td>
+-->
+			<td><video width="900" height="506" controls><source src="wildstylegan.mp4" type="video/mp4"></source></video>
+			</td>
+		  </tr>
+		</tbody>
+	  </table>
+		 
+
+	
+	
+	<p class="section">&nbsp;</p>
+	<p class="section">Image Generation Results for a Variety of Domains</p>
+    Our Self-Distilled StyleGAN framework enables high-quality and diverse image generation from uncurated Internet datasets. <br>
+	* Click on the images for viewing them in full size.
+		 
+		
+        <br>
+        
+        <h3 align="center">Lions</h3>
+        <table width="200" border="0" align="center">
+            <tbody>
+<table width="100%" border="0">
+	    <tbody>
+        
+		  <tr>
+	        <th colspan="2" rowspan="2">
+				<a style="display: inline-block;" href="generated/lions/Lions_26.png"><img src="generated/lions/Lions_26.png" width="410" height="410" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/lions/5.jpg"><img src="generated/lions/5.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/lions/1.jpg"><img src="generated/lions/1.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/lions/Lions_63.png"><img src="generated/lions/Lions_63.png" width="200" height="200" alt=""/></a>
+			</th>
+	    		 </tr><tr>
+			<th>
+			  <a style="display: inline-block;" href="generated/lions/24.jpg"><img src="generated/lions/24.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="generated/lions/Lions_43.png"><img src="generated/lions/Lions_43.png" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="generated/lions/2.jpg"><img src="generated/lions/2.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+                      </tbody>
+        </table>
+		<h3 align="center">Giraffes</h3>
+        <table width="200" border="0" align="center">
+            <tbody>
+<table width="100%" border="0">
+	    <tbody>
+		  <tr>
+	        <th colspan="2" rowspan="2">
+			  <a style="display: inline-block;" href="generated/giraffes/1.jpg"><img src="generated/giraffes/1.jpg" width="410" height="410" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/giraffes/19.jpg"><img src="generated/giraffes/19.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/giraffes/7.jpg"><img src="generated/giraffes/7.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/giraffes/6.jpg"><img src="generated/giraffes/6.jpg" width="200" height="200" alt=""/></a>
+			</th>
+		</tr><tr>
+			<th>
+			  <a style="display: inline-block;" href="generated/giraffes/4.jpg"><img src="generated/giraffes/4.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="generated/giraffes/14.jpg"><img src="generated/giraffes/14.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="generated/giraffes/22.jpg"><img src="generated/giraffes/22.jpg" width="200" height="200" alt=""/></a>
+			</th>			
+	      </tr>
+                      </tbody>
+        </table>
+        <h3 align="center">Elephants</h3>
+        <table width="200" border="0" align="center">
+            <tbody>
+<table width="100%" border="0">
+	    <tbody>
+          		  <tr>
+	        <th colspan="2" rowspan="2">
+			  <a style="display: inline-block;" href="generated/elephants/Elephants_52.png"><img src="generated/elephants/Elephants_52.png" width="410" height="410" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/elephants/3.jpg"><img src="generated/elephants/3.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/elephants/18.jpg"><img src="generated/elephants/18.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/elephants/elephants_70.png"><img src="generated/elephants/elephants_70.png" width="200" height="200" alt=""/></a>
+			</th>
+		</tr><tr>
+			<th>
+			  <a style="display: inline-block;" href="generated/elephants/0.jpg"><img src="generated/elephants/0.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="generated/elephants/elephants_64.png"><img src="generated/elephants/elephants_64.png" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="generated/elephants/8.jpg"><img src="generated/elephants/8.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+         </tbody>
+        </table>
+        
+                <h3 align="center">Parrots</h3>
+        <table width="200" border="0" align="center">
+            <tbody>
+<table width="100%" border="0">
+	    <tbody>
+		  <tr>
+		  	        <th colspan="2" rowspan="2">
+			  <a style="display: inline-block;" href="generated/parrots/9.png"><img src="generated/parrots/9.png" width="410" height="410" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/parrots/47.png"><img src="generated/parrots/47.png" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/parrots/73.png"><img src="generated/parrots/73.png" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/parrots/4.png"><img src="generated/parrots/4.png" width="200" height="200" alt=""/></a>
+			</th>
+		</tr><tr>
+			<th>
+			  <a style="display: inline-block;" href="generated/parrots/77.png"><img src="generated/parrots/77.png" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="generated/parrots/78.png"><img src="generated/parrots/78.png" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+			  <a style="display: inline-block;" href="generated/parrots/81.png"><img src="generated/parrots/81.png" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+            </tbody>
+        </table>
+		<h3 align="center">Dogs</h3>
+        <table width="200" border="0" align="center">
+            <tbody>
+<table width="100%" border="0" cellspacing="1" cellpadding="1">
+	    <tbody>
+	    		  <tr>
+	        <td colspan="2" rowspan="2">
+			  <a style="display: inline-block;" href="generated/dogs/5.jpg"><img src="generated/dogs/5.jpg" width="410" height="410" alt=""/></a>
+			</td>
+			<td>
+				<a style="display: inline-block;" href="generated/dogs/Dogs_38.png"><img src="generated/dogs/Dogs_38.png" width="200" height="200" alt=""/></a>
+			</td>
+			<td>
+				<a style="display: inline-block;" href="generated/dogs/20.jpg"><img src="generated/dogs/20.jpg" width="200" height="200" alt=""/></a>
+			</td>
+			<td>
+				<a style="display: inline-block;" href="generated/dogs/10.jpg"><img src="generated/dogs/10.jpg" width="200" height="200" alt=""/></a>
+			</td>
+	    		 </tr><tr>
+			<td>
+			  <a style="display: inline-block;" href="generated/dogs/Dogs_34.png"><img src="generated/dogs/Dogs_34.png" width="200" height="200" alt=""/></a>
+			</td>
+			<td>
+			  <a style="display: inline-block;" href="generated/dogs/30.jpg"><img src="generated/dogs/30.png" width="200" height="200" alt=""/></a>
+			</td>
+			<td>
+			  <a style="display: inline-block;" href="generated/dogs/25.jpg"><img src="generated/dogs/25.jpg" width="200" height="200" alt=""/></a>
+			</td>
+          </tr>
+
+            </tbody>
+        </table>
+         <h3 align="center">LSUN - Bicycles</h3>
+        <table width="200" border="0" align="center">
+            <tbody>
+<table width="100%" border="0">
+	    <tbody>
+		  <tr>
+	        <th>
+			  <a style="display: inline-block;" href="generated/bicycles/19.png"><img src="generated/bicycles/19.png" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/bicycles/27.png"><img src="generated/bicycles/27.png" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/bicycles/59.png"><img src="generated/bicycles/59.png" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/bicycles/80.png"><img src="generated/bicycles/80.png" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="generated/bicycles/93.png"><img src="generated/bicycles/93.png" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+                      </tbody>
+        </table>
+
+        <h3 align="center">LSUN - Horses</h3>
+        <table width="200" border="0" align="center">
+            <tbody>
+<table width="100%" border="0">
+	    <tbody>
+		  <tr>
+		  	        <th>
+			  <a style="display: inline-block;" href="generated/horses/23.jpg"><img src="generated/horses/23.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/horses/16.jpg"><img src="generated/horses/16.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/horses/6.jpg"><img src="generated/horses/6.jpg" width="200" height="200" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="generated/horses/18.jpg"><img src="generated/horses/18.jpg" width="200" height="200" alt=""/></a>
+			</th>
+									<th>
+			  <a style="display: inline-block;" href="generated/horses/19.jpg"><img src="generated/horses/19.jpg" width="200" height="200" alt=""/></a>
+			</th>
+          </tr>
+            </tbody>
+        </table>
+
+
+		<p class="section">&nbsp;</p>
+		<p class="section">Cluster Center Visualization</p>
+		<p>Raw uncurated images collected from the internet tend to be rich and diverse, consisting of multiple modalities, which constitute different geometry and texture characteristics. To maintain the diversity of the generated images while improving their visual quality, we introduce a <it>multi-modal truncation trick</it>. Our key idea is to incorporate multiple cluster centers, and then truncate each sampled code towards the most similar center. </p>
+		<p>Here we show random walks between our cluster centers in the latent space of various domains. As can be seen, the cluster centers are highly diverse and captures well the multi-modal nature of the data. </p>
+		<br>
+ 	  <table width="100%" border="0">
+	    <tbody>
+	      <tr>
+			<th align="center" style="font-size: 18px">Lions</th>
+			<th align="center" style="font-size: 18px">Dogs</th>
+			<th align="center" style="font-size: 18px">Parrots</th>
+			<th align="center" style="font-size: 18px">Potted Plant</th>
+          </tr>
+	      <tr>
+	        <th>
+				<a style="display: inline-block;" href="cluster_interpolation/lions.mp4"><video autoplay muted loop controls src="cluster_interpolation/lions.mp4" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="cluster_interpolation/dogs.mp4"><video autoplay muted loop controls src="cluster_interpolation/dogs.mp4" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="cluster_interpolation/parrots.mp4"><video autoplay muted loop controls src="cluster_interpolation/parrots.mp4" width="256" height="256" alt=""/></a>
+			</th>
+			<th>
+				<a style="display: inline-block;" href="cluster_interpolation/potted_plant.mp4"><video autoplay muted loop controls src="cluster_interpolation/potted_plant.mp4" width="256" height="256" alt=""/></a>
+			</th>
+          </tr>	 
+          </tbody>
+	  </table>
+         <p align="center"> <button onclick="play_all();">Play/Pause All</button> </p>
+	<p class="section">&nbsp;</p>
+	<p class="section">Semantic Editing Examples</p>
+    Our approach retains StyleGAN's remarkable semantic editing capabilities, enabling us to perform various editing to each domain. 
+        
+	<table width="100%" border="0" style="border-spacing: 0px; border-collapse: collapse">
+    <tbody>
+
+		<tr><th colspan="4" align="center" style="font-size: 23px"><br>Lions<br><br></th></tr>
+		<tr>
+			<th colspan="2" align="center" style="font-size: 18px">Roar
+			<table border="0">
+			<tbody>
+				<tr>
+					<th>
+						<a style="display: inline-block;" href="editing/lions/roar - styleclip/roaring1.gif"><img src="editing/lions/roar - styleclip/roaring1.gif" width="256" height="256" alt=""/></a>
+					</th>
+					<th>
+					  <a style="display: inline-block;" href="editing/lions/roar - styleclip/roaring2.gif"><img src="editing/lions/roar - styleclip/roaring2.gif" width="256" height="256" alt=""/></a>
+					</th>
+				</tr>
+				<tr>
+					<th>
+					  <a style="display: inline-block;" href="editing/lions/roar - styleclip/roaring3.gif"><img src="editing/lions/roar - styleclip/roaring3.gif" width="256" height="256" alt=""/></a>
+					</th>
+					<th>
+					  <a style="display: inline-block;" href="editing/lions/roar - styleclip/roaring4.gif"><img src="editing/lions/roar - styleclip/roaring4.gif" width="256" height="256" alt=""/></a>
+					</th>
+				</tr>
+			</tbody>
+			</table>
+			</th>
+			<th colspan="1" align="center" style="font-size: 18px; border-left: 1.5px solid">Add / Remove Mane
+			<table border="0" >
+			<tbody>
+				<tr>
+					<th>
+					  <a style="display: inline-block;" href="editing/lions/mane/075.gif"><img src="editing/lions/mane/075.gif" width="256" height="256" alt=""/></a>
+					</th>
+				</tr>
+				<tr>
+					<th>
+					  <a style="display: inline-block;" href="editing/lions/mane/006.gif"><img src="editing/lions/mane/006.gif" width="256" height="256" alt=""/></a>
+					</th>
+				</tr>
+			</tbody>
+			</table>
+			</th>
+			<th colspan="1" align="center" style="font-size: 18px; border-left: 1.5px solid">Head Pane Rotation
+			<table border="0" >
+			<tbody>
+				<tr>
+					<th>
+					  <a style="display: inline-block;" href="editing/lions/head_turn/065.gif"><img src="editing/lions/head_turn/065.gif" width="256" height="256" alt=""/></a>
+					</th>
+				</tr>
+				<tr>
+					<th>
+					  <a style="display: inline-block;" href="editing/lions/head_turn/095.gif"><img src="editing/lions/head_turn/095.gif" width="256" height="256" alt=""/></a>
+					</th>
+				</tr>
+			</tbody>
+			</table>
+			</th>
+		</tr>
+	</tbody>
+	</table>
+	<br><br>
+	<table width="100%" border="0" align="center" style="border-spacing: 0px; border-collapse: collapse">
+    <tbody>
+		<tr><th colspan="2" align="center" style="font-size: 23px">Parrots<br><br>
+		<table border="0" style="border-spacing: 0px; border-collapse: collapse">
+		<tbody>
+			<tr>
+				<th colspan="1" align="center" style="font-size: 18px">Head Pane Rotation
+				<table border="0" style="border-spacing: 0px; border-collapse: collapse">
+				<tbody>
+					<tr>
+						<th>
+						  <a style="display: inline-block;" href="editing/parrots/head_pan/152.gif"><img src="editing/parrots/head_pan/152.gif" width="256" height="256" alt=""/></a>
+						</th>
+					</tr>
+					<tr>
+						<th>
+						  <a style="display: inline-block;" href="editing/parrots/head_pan/142.gif"><img src="editing/parrots/head_pan/142.gif" width="256" height="256" alt=""/></a>
+						</th>
+					</tr>
+				</tbody>
+				</table>
+				</th>
+				<th colspan="1" align="center" style="font-size: 18px; border-left: 1.5px solid">Zoom In/Out
+				<table border="0" style="border-spacing: 0px; border-collapse: collapse">
+				<tbody>
+					<tr>
+						<th>
+						  <a style="display: inline-block;" href="editing/parrots/closeup/124.gif"><img src="editing/parrots/closeup/124.gif" width="256" height="256" alt=""/></a>
+						</th>
+					</tr>
+					<tr>
+						<th>
+						  <a style="display: inline-block;" href="editing/parrots/closeup/048.gif"><img src="editing/parrots/closeup/048.gif" width="256" height="256" alt=""/></a>
+						</th>
+					</tr>
+				</tbody>
+				</table>
+				</th>
+			</tr>
+		</tbody>
+		</table>
+		</th>
+		<th colspan="2" align="center" style="font-size: 23px; border-left: 2px solid">Horses<br><br>
+		<table border="0" style="border-spacing: 0px; border-collapse: collapse">
+		<tbody>
+			<tr>
+				<th colspan="1" align="center" style="font-size: 18px">Head Up/Down
+				<table border="0" style="border-spacing: 0px; border-collapse: collapse">
+				<tbody>
+					<tr>
+						<th>
+						  <a style="display: inline-block;" href="editing/horse/head_down/046.gif"><img src="editing/horse/head_down/046.gif" width="256" height="256" alt=""/></a>
+						</th>
+					</tr>
+					<tr>
+						<th>
+						  <a style="display: inline-block;" href="editing/horse/head_down/087.gif"><img src="editing/horse/head_down/087.gif" width="256" height="256" alt=""/></a>
+						</th>
+					</tr>
+				</tbody>
+				</table>
+				</th>
+				<th colspan="1" align="center" style="font-size: 18px; border-left: 1.5px solid">Running/Standing Still
+				<table border="0" style="border-spacing: 0px; border-collapse: collapse">
+				<tbody>
+					<tr>
+						<th>
+						  <a style="display: inline-block;" href="editing/horse/running/000.gif"><img src="editing/horse/running/000.gif" width="256" height="256" alt=""/></a>
+						</th>
+					</tr>
+					<tr>
+						<th>
+						  <a style="display: inline-block;" href="editing/horse/white/046.gif"><img src="editing/horse/running/089.gif" width="256" height="256" alt=""/></a>
+						</th>
+					</tr>
+				</tbody>
+				</table>
+				</th>
+			</tr>
+		</tbody>
+		</table>
+		</th>
+		</tr>
+		
+		</tbody>
+	</table>
+		<p class="section">&nbsp;</p>
+        <p class="section" id="paper">Paper</p>
+        <table border="0">
+            <tbody>
+                <tr>
+                    <td><a href="paper.pdf"><img src="images/paper.png" alt="" width="200"></a></td>
+                    <td>&nbsp;</td>
+                    <td>
+                        <p><br><b>"Self-Distilled StyleGAN: Towards Generation from Internet",</b><br> Ron Mokady, Michal Yarom, Omer Tov, Oran Lang, Daniel Cohen-Or, Tali Dekel, Michal Irani and Inbar Mosseri.</p>
+                        [<a href="paper.pdf">PDF</a>]
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="section" id="sm">Results / Supplementary Material</p>
+        <table width="283" border="0">
+            <tbody>
+                <tr>
+                    <td width="165"><a href="supplementary/index.html"><img src="images/supp.png" alt="" width="207"></a></td>
+                    <td width="6">&nbsp;</td>
+                    <td width="56">
+                        [<a href="supplementary/index.html">Link</a>]
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+		<p class="section" id="Datasets">Datasets and Code</p>
+        <table  border="0">
+            <tbody>
+                <tr>
+                    <td width="60"><a href="https://github.com/google/SDFA"><img src="images/github_logo.png" alt="" width="60"></a></td>
+                    <td width="6">&nbsp;</td>
+                    <td width="56">
+                        [<a href="https://github.com/google/SDFA">Datasets&amp;Code</a>]
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p></p>
+        <p class="section">Bibtex</p>
+        <table border="0">
+            <tbody>
+                <tr>
+                    <td class="bibtex">@misc{mokady2022self, <br>        title={Self-Distilled StyleGAN: Towards Generation from Internet Photos},<br>        author={Ron Mokady and Michal Yarom and Omer Tov and Oran Lang and <br>            Daniel Cohen-Or, Tali Dekel, Michal Irani and Inbar Mosseri},<br>        year={2022},<br>        eprint={}, <br>        archivePrefix={arXiv}, <br>        primaryClass={cs.CV} <br>}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p></p>
+        <p class="section">&nbsp;</p>
+        <p align="center" class="date">Last updated: Apr 2021</p>
+    </div>
+				
+	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+	<script type="text/javascript" src="slick/slick.min.js"></script>
+	
+	<script>
+	  $(document).ready(function(){
+		$('.carousel-images').slick();
+//		  setting-name: setting-value
+//		  slidesToShow: 3,
+//		  slidesToScroll: 1,
+//		  autoplay: true,
+//		  autoplaySpeed: 2000,
+	  });
+	</script>
+
+</body>
+</html>
